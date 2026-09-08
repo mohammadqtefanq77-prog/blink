@@ -1,23 +1,12 @@
 {
-  "name": "Blink - الأردن",
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Blink",
+  "orientation": "any",
+  "scope": "/",
   "short_name": "Blink",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0ea5e9",
-  "description": "تطبيق بلينك - الأردن الشامل: منصة محتوى وسوق ذكي ونظام شحن",
-  "icons": [
-    {
-      "src": "/vite.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/vite.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "theme_color": "#ffffff",
+  "id": "com.blink.app"
 }

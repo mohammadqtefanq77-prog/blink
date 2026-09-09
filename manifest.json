@@ -13,8 +13,8 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "start_url": "/blink/",
+  ],"start_url": "/blink/",
+  
   "scope": "/",
   "background_color": "#ffffff",
   "display": "standalone",

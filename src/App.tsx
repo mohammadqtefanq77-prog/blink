@@ -3,7 +3,11 @@ import {
   Language,
   UserLocation,
   ContentPost,
+  SearchResultResponse
 } from './types';
+import { performSmartSearch } from './services/adService';
+import { SmartSearchView } from './components/SmartSearchView';
+import { UnifiedProfileModal } from './components/UnifiedProfileModal';
 import {
   INITIAL_CONTENT_POSTS,
 } from './data/initialData';
@@ -13,13 +17,15 @@ import { JordanSmartMarketView } from './components/JordanSmartMarketView';
 import { SmartMarketSevenView } from './components/SmartMarketSevenView';
 import { JordanContentFeedView } from './components/JordanContentFeedView';
 import { LocationModal } from './components/LocationModal';
-import { Globe, MapPin, Search, Clapperboard, Store, ChevronLeft } from 'lucide-react';
+import { Globe, MapPin, Search, Clapperboard, Store, ChevronLeft, Plus } from 'lucide-react';
+import UnifiedRegistrationModal from './components/UnifiedRegistrationModal';
 import { JordanFlag } from './components/JordanFlag';
 
-export type BlinkAppView = 'home' | 'market' | 'content';
+export type BlinkAppView = 'home' | 'market' | 'content' | 'search';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<BlinkAppView>('home');
+  const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [language, setLanguage] = useState<Language>('ar');
   const [userLocation, setUserLocation] = useState<UserLocation>(DEFAULT_USER_LOCATION);
 
@@ -28,6 +34,9 @@ export default function App() {
 
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResult, setSearchResult] = useState<SearchResultResponse | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedProfileEntity, setSelectedProfileEntity] = useState<any | null>(null);
 
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === 'ar' ? 'en' : 'ar'));
@@ -42,10 +51,18 @@ export default function App() {
     setIsLocationModalOpen(false);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      setCurrentView('market');
+      setCurrentView('search');
+      setIsSearching(true);
+      try {
+        const res = await performSmartSearch(searchQuery, userLocation);
+        setSearchResult(res);
+      } catch (e) {
+        console.error(e);
+      }
+      setIsSearching(false);
     }
   };
 
@@ -56,13 +73,23 @@ export default function App() {
     >
       {/* 1. TOP: Country / Language Selector */}
       <header className="w-full px-4 sm:px-6 py-4 flex items-center justify-between bg-white shadow-sm z-20">
-        <button
-          onClick={toggleLanguage}
-          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-xs sm:text-sm font-bold transition-colors border border-neutral-200"
-        >
-          <Globe className="w-4 h-4 text-neutral-600" />
-          <span>{language === 'ar' ? 'ع / EN' : 'EN / ع'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-xs sm:text-sm font-bold transition-colors border border-neutral-200"
+          >
+            <Globe className="w-4 h-4 text-neutral-600" />
+            <span>{language === 'ar' ? 'ع / EN' : 'EN / ع'}</span>
+          </button>
+          
+          <button
+            onClick={() => setIsRegistrationModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-[#FF6B00] hover:bg-[#e66000] text-white text-xs sm:text-sm font-bold transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            <span>تسجيل</span>
+          </button>
+        </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <button
@@ -136,6 +163,36 @@ export default function App() {
       )}
 
       {/* Views */}
+      {currentView === 'search' && (
+        <div className="flex-1 flex flex-col bg-neutral-50 relative">
+          <header className="bg-white shadow-sm p-4 sticky top-0 z-50 flex items-center">
+            <button onClick={() => setCurrentView('home')} className="flex items-center gap-2 font-bold text-neutral-600 hover:text-black">
+              <ChevronLeft className="w-5 h-5 rtl:rotate-180" /> {language === 'ar' ? 'رجوع للرئيسية' : 'Back to Home'}
+            </button>
+          </header>
+          <div className="flex-1 relative z-0 mt-6">
+            <SmartSearchView
+              onPerformSearch={async (query) => {
+                setSearchQuery(query);
+                setIsSearching(true);
+                const res = await performSmartSearch(query, userLocation);
+                setSearchResult(res);
+                setIsSearching(false);
+                return res;
+              }}
+              searchResult={searchResult}
+              isSearching={isSearching}
+              userLocation={userLocation}
+              language={language}
+              onOpenLocationModal={() => setIsLocationModalOpen(true)}
+              onOpenContentPost={(post) => console.log('post', post)}
+              onOpenAdDetail={(ad) => setSelectedProfileEntity(ad)}
+              onOpenPage={(page) => setSelectedProfileEntity(page)}
+              onOpenPersonProfile={(person) => setSelectedProfileEntity(person)}
+            />
+          </div>
+        </div>
+      )}
       {currentView === 'market' && (
         <div className="flex-1 flex flex-col bg-neutral-50 relative">
           <header className="bg-white shadow-sm p-4 sticky top-0 z-50 flex items-center">
@@ -181,6 +238,19 @@ export default function App() {
         onClose={() => setIsLocationModalOpen(false)}
         currentLocation={userLocation}
         onSelectLocation={handleSelectLocation}
+      />
+      <UnifiedProfileModal
+        entity={selectedProfileEntity}
+        isOpen={!!selectedProfileEntity}
+        onClose={() => setSelectedProfileEntity(null)}
+      />
+      <UnifiedRegistrationModal
+        isOpen={isRegistrationModalOpen}
+        onClose={() => setIsRegistrationModalOpen(false)}
+        onSuccess={() => {
+          setIsRegistrationModalOpen(false);
+          // Optional: Force refresh or show toast
+        }}
       />
     </div>
   );

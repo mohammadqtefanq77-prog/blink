@@ -48,7 +48,7 @@ interface SmartSearchViewProps {
   onOpenLocationModal: () => void;
   onOpenContentPost: (post: ContentPost) => void;
   onOpenAdDetail: (ad: Ad) => void;
-  onOpenPage: (pageId: string) => void;
+  onOpenPage: (page: any) => void;
   onNavigateToServices?: () => void;
   onNavigateToEntertainment?: () => void;
   onNavigateToMarket?: () => void;
@@ -545,6 +545,10 @@ export const SmartSearchView: React.FC<SmartSearchViewProps> = ({
                           onOpenAdDetail(item.rawItem);
                         } else if (item.type === 'content') {
                           onOpenContentPost(item.rawItem);
+                        } else if (item.type === 'page' && typeof onOpenPage === 'function') {
+                          onOpenPage(item.rawItem);
+                        } else if (item.type === 'store_product' || item.type === 'market_item') {
+                          // Handle later if needed
                         }
                       }}
                       className="flex items-center gap-3 min-w-0 cursor-pointer flex-1"

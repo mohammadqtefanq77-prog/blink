@@ -1,9 +1,22 @@
 {
-  "name": "Blink - الأردن",
-  "description": "تطبيق بلينك - الأردن الشامل: منصة محتوى، سوق ذكي (7 أقسام)، معارض سيارات، شركات عقار، متاجر ألبسة، مطاعم، ونظام شحن وتوصيل ذكي (تجميع 1 د.أ / منفرد 5 د.أ)",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "short_name": "Blink",
+  "name": "Blink Mobile Application",
+  "description": "Blink Application",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#000000"
 }
-

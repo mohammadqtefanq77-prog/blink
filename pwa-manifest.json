@@ -1,6 +1,7 @@
 {
   "short_name": "Blink",
-  "name": "Blink App",
+  "name": "Blink Mobile Application",
+  "description": "Blink Application",
   "icons": [
     {
       "src": "https://via.placeholder.com/192",
@@ -14,6 +15,7 @@
     }
   ],
   "start_url": "/",
+  "scope": "/",
   "background_color": "#ffffff",
   "display": "standalone",
   "theme_color": "#000000"
